@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Panel del Administrador</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(120deg, #8e44ad, #3498db);
+      min-height: 100vh;
+      margin: 0;
+      padding: 40px;
+      color: white;
+    }
+    .panel-container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      color: #333;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      animation: fadeIn 0.5s ease-out;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #2c3e50;
+    }
+    .user-info {
+      text-align: right;
+      font-size: 14px;
+      color: #7f8c8d;
+      margin-bottom: 20px;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      margin: 12px 0;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      background-color: #8e44ad;
+      color: white;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background-color: #732d91;
+      transform: translateY(-1px);
+    }
+    button.logout {
+      background-color: #e74c3c;
+      margin-top: 30px;
+    }
+    button.logout:hover {
+      background-color: #c0392b;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="panel-container">
+    <div class="user-info">
+      Bienvenido: <span id="nombre-usuario"></span>
+    </div>
+    <h2>Panel del Administrador</h2>
+
+    <button onclick="window.location.href='agregar-area.html'">📋 Agregar Área</button>
+    <button onclick="window.location.href='agregar-colaborador.html'">👥 Agregar Colaborador</button>
+    <button onclick="window.location.href='agregar-supervisor.html'">👔 Agregar Supervisor</button>
+    <button onclick="window.location.href='agregar-epp.html'">🛡️ Agregar EPP</button>
+    <button onclick="window.location.href='agregar-administrador.html'">🔑 Agregar Administrador</button>
+    <button onclick="cerrarSesion()" class="logout">🚪 Cerrar sesión</button>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const nombre = localStorage.getItem('nombre');
+      if (nombre) {
+        document.getElementById('nombre-usuario').textContent = nombre;
+      } else {
+        window.location.href = 'index.html'; // Redirigir si no hay sesión
+      }
+    });
+
+    function cerrarSesion() {
+      localStorage.clear();
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>

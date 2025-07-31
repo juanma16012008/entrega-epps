@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Agregar Colaborador</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1abc9c, #16a085);
+      padding: 30px;
+      color: #fff;
+    }
+    .form-container {
+      background: white;
+      color: #333;
+      max-width: 400px;
+      margin: auto;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      animation: fadeIn 0.7s ease-in;
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      background-color: #1abc9c;
+      color: white;
+      border: none;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #16a085;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Agregar Colaborador</h2>
+    <form id="form-colaborador">
+      <label for="cedula">Cédula:</label>
+      <input type="text" id="cedula" required>
+      <label for="nombre_colaborador">Nombre del Colaborador:</label>
+      <input type="text" id="nombre_colaborador" required>
+      <button type="submit">Guardar</button>
+    </form>
+  </div>
+
+  <script>
+
+     const supabaseClient = supabase.createClient(
+  	'https://jvcuujwkniicekolwljs.supabase.co',
+  	'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2Y3V1andrbmlpY2Vrb2x3bGpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyMzE5MzgsImV4cCI6MjA2ODgwNzkzOH0.OFjrtoY0c9SLoDyNYuANxhCSA22cmTyAYfI8ceTICZ8'
+     );
+
+    document.getElementById('form-colaborador').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const cedula = document.getElementById('cedula').value.trim();
+      const nombre_colaborador = document.getElementById('nombre_colaborador').value.trim();
+
+      const { error } = await supabaseClient.from('colaboradores').insert([
+        { cedula, nombre_colaborador }
+      ]);
+
+      if (error) {
+        alert("❌ Error al guardar");
+        console.error(error);
+      } else {
+        alert("✅ Colaborador registrado");
+        e.target.reset();
+      }
+    });
+  </script>
+</body>
+</html>

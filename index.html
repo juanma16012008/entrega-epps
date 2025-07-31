@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login de Usuarios</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1abc9c, #16a085);
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+    }
+    .login-container {
+      background: white;
+      color: #333;
+      width: 100%;
+      max-width: 400px;
+      padding: 40px 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      animation: fadeIn 0.7s ease-in;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #2c3e50;
+    }
+    input {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      font-size: 16px;
+      box-sizing: border-box;
+      transition: border 0.3s;
+    }
+    input:focus {
+      outline: none;
+      border-color: #1abc9c;
+      box-shadow: 0 0 0 2px rgba(26, 188, 156, 0.3);
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      background-color: #1abc9c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #16a085;
+    }
+    .required:after {
+      content: " *";
+      color: #e74c3c;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Iniciar Sesión</h2>
+    <form id="login-form">
+     
+      <input type="text" id="cedula" required placeholder="Ingrese su cédula">
+      <button type="submit">Entrar</button>
+    </form>
+  </div>
+
+  <script>
+    const supabaseClient = supabase.createClient(
+      'https://jvcuujwkniicekolwljs.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2Y3V1andrbmlpY2Vrb2x3bGpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyMzE5MzgsImV4cCI6MjA2ODgwNzkzOH0.OFjrtoY0c9SLoDyNYuANxhCSA22cmTyAYfI8ceTICZ8'
+    );
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const cedula = document.getElementById('cedula').value.trim();
+
+      if (!cedula) {
+        alert("Por favor ingrese una cédula válida.");
+        return;
+      }
+
+      try {
+        // Primero verificar en supervisores
+        const { data: supervisor, error: errorSupervisor } = await supabaseClient
+          .from('supervisores')
+          .select('cedula, nombre_supervisor')
+          .eq('cedula', cedula)
+          .single();
+
+        if (!errorSupervisor && supervisor) {
+          localStorage.setItem('cedula', supervisor.cedula);
+          localStorage.setItem('nombre', supervisor.nombre_supervisor);
+          localStorage.setItem('rol', 'supervisor');
+          window.location.href = 'formulario-entregas.html';
+          return;
+        }
+
+        // Si no es supervisor, verificar en administradores
+        const { data: administrador, error: errorAdmin } = await supabaseClient
+          .from('administrador')
+          .select('cedula, nombre, Rol')
+          .eq('cedula', cedula)
+          .single();
+
+        if (errorAdmin || !administrador) {
+          throw new Error('Usuario no encontrado');
+        }
+
+        localStorage.setItem('cedula', administrador.cedula);
+        localStorage.setItem('nombre', administrador.nombre);
+        localStorage.setItem('rol', administrador.Rol.toLowerCase());
+
+        if (administrador.Rol.toLowerCase() === 'administrador') {
+          window.location.href = 'panel-admin.html';
+        } else {
+          alert('Rol no reconocido: ' + administrador.Rol);
+        }
+
+      } catch (error) {
+        console.error("Error en login:", error);
+        alert('❌ Cédula no registrada o error en el sistema');
+      }
+    });
+
+    // Enfocar automáticamente el campo de cédula al cargar
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('cedula').focus();
+    });
+  </script>
+</body>
+</html>
