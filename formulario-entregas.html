@@ -1,61 +1,153 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Formulario de Entregas</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f2f2f2;
+    :root {
+      --primary-color: #2980b9;
+      --primary-dark: #1c5985;
+      --secondary-color: #7f8c8d;
+      --secondary-dark: #6c7a7d;
+      --text-color: #2c3e50;
+      --light-gray: #f2f2f2;
+      --medium-gray: #ddd;
+      --white: #ffffff;
+      --border-radius: 8px;
+      --box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
-    .form-container {
-      background-color: #fff;
-      max-width: 700px;
-      margin: 40px auto;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--light-gray);
+      color: var(--text-color);
+      line-height: 1.6;
+      padding: 0;
+      margin: 0;
     }
+
+    .form-container {
+      background-color: var(--white);
+      max-width: 100%;
+      margin: 0;
+      padding: 20px;
+      box-shadow: var(--box-shadow);
+    }
+
     h1 {
       text-align: center;
-      color: #2c3e50;
+      color: var(--text-color);
+      margin-bottom: 20px;
+      font-size: 1.5rem;
     }
+
     label {
       display: block;
       margin-bottom: 8px;
       font-weight: bold;
+      color: var(--text-color);
     }
+
     select, input[type="text"], input[type="date"] {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       margin-bottom: 15px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--medium-gray);
       font-size: 16px;
+      background-color: var(--white);
+      transition: var(--transition);
     }
+
+    select:focus, input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(41, 128, 185, 0.2);
+    }
+
     .epp-group {
-      background: #f9f9f9;
+      background: var(--light-gray);
       padding: 15px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
+      border: 1px solid var(--medium-gray);
+      border-radius: var(--border-radius);
       margin-bottom: 15px;
+      position: relative;
     }
+
     button {
       width: 100%;
       padding: 12px;
-      background-color: #2980b9;
-      color: white;
+      background-color: var(--primary-color);
+      color: var(--white);
       border: none;
-      border-radius: 6px;
+      border-radius: var(--border-radius);
       cursor: pointer;
       font-size: 16px;
+      font-weight: bold;
+      transition: var(--transition);
+      margin-top: 10px;
     }
+
     button:hover {
-      background-color: #1c5985;
+      background-color: var(--primary-dark);
+    }
+
+    button.secondary {
+      background-color: var(--secondary-color);
+      margin-bottom: 15px;
+    }
+
+    button.secondary:hover {
+      background-color: var(--secondary-dark);
+    }
+
+    .required:after {
+      content: " *";
+      color: #e74c3c;
+    }
+
+    /* Estilos responsive */
+    @media (min-width: 600px) {
+      .form-container {
+        max-width: 700px;
+        margin: 40px auto;
+        padding: 30px;
+        border-radius: 12px;
+      }
+
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 30px;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+
+      .full-width {
+        grid-column: span 2;
+      }
+    }
+
+    @media (min-width: 900px) {
+      .form-grid {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+
+      .full-width {
+        grid-column: span 3;
+      }
     }
   </style>
 </head>
@@ -63,34 +155,46 @@
   <div class="form-container">
     <h1>Entrega de EPPs</h1>
     <form id="form-entrega">
-      <label>Fecha:</label>
-      <input type="date" id="fecha" required>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="required">Fecha:</label>
+          <input type="date" id="fecha" required>
+        </div>
 
-      <label>Supervisor:</label>
-      <select id="supervisor" required></select>
+        <div class="form-group">
+          <label class="required">Supervisor:</label>
+          <select id="supervisor" required></select>
+        </div>
 
-      <label>Área:</label>
-      <select id="area" required></select>
+        <div class="form-group">
+          <label class="required">Área:</label>
+          <select id="area" required></select>
+        </div>
 
-      <label>Nombre del colaborador:</label>
-      <select id="nombre_colaborador" required></select>
+        <div class="form-group">
+          <label class="required">Nombre del colaborador:</label>
+          <select id="nombre_colaborador" required></select>
+        </div>
 
-      <label>Cédula del colaborador:</label>
-      <input type="text" id="cedula_colaborador" disabled>
+        <div class="form-group">
+          <label>Cédula del colaborador:</label>
+          <input type="text" id="cedula_colaborador" disabled>
+        </div>
 
-      <div id="epp-container">
-        <div class="epp-group">
-          <label>EPP (Descripción):</label>
-          <select class="epp-select" required></select>
-          <input type="hidden" class="codigo">
+        <div class="full-width" id="epp-container">
+          <div class="epp-group">
+            <label class="required">EPP (Descripción):</label>
+            <select class="epp-select" required></select>
+            <input type="hidden" class="codigo">
+          </div>
         </div>
       </div>
 
-      <button type="button" onclick="agregarEPP()">➕ Agregar otro EPP</button>
-      <br><br>
+      <button type="button" onclick="agregarEPP()" class="secondary">➕ Agregar otro EPP</button>
       <button type="submit">Guardar entrega</button>
     </form>
   </div>
+
 
   <script>
     const supabaseClient = supabase.createClient(
@@ -256,3 +360,4 @@
   </script>
 </body>
 </html>
+
