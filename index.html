@@ -7,12 +7,12 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
-      --primary-color: #6fd3c7;  /* Turquesa suave */
-      --primary-dark: #4bb5a8;   /* Turquesa un poco más oscuro */
+      --primary-color: #1abc9c;
+      --primary-dark: #16a085;
       --secondary-color: #f8f9fa;
-      --text-color: #4a4a4a;     /* Gris oscuro suave */
+      --text-color: #333;
       --white: #ffffff;
-      --shadow: 0 10px 30px rgba(0,0,0,0.08); /* Sombra más suave */
+      --shadow: 0 10px 30px rgba(0,0,0,0.1);
       --border-radius: 10px;
       --transition: all 0.3s ease;
     }
@@ -25,13 +25,13 @@
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #e0f7fa, #b2ebf2); /* Degradado suave azul claro */
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
       padding: 20px;
-      color: var(--text-color);
+      color: var(--white);
     }
 
     .login-container {
@@ -51,7 +51,6 @@
       margin-bottom: 25px;
       color: var(--text-color);
       font-size: 1.8rem;
-      font-weight: 500; /* Más delgado */
     }
 
     .form-group {
@@ -61,7 +60,7 @@
     label {
       display: block;
       margin-bottom: 8px;
-      font-weight: 500; /* Más delgado */
+      font-weight: 600;
       color: var(--text-color);
     }
 
@@ -70,16 +69,15 @@
       padding: 15px;
       margin-bottom: 5px;
       border-radius: var(--border-radius);
-      border: 1px solid #e0e0e0; /* Borde más suave */
+      border: 1px solid #ddd;
       font-size: 1rem;
       transition: var(--transition);
-      background-color: #fafafa; /* Fondo del input más suave */
     }
 
     input:focus {
       outline: none;
       border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(111, 211, 199, 0.2); /* Sombra más suave */
+      box-shadow: 0 0 0 3px rgba(26, 188, 156, 0.2);
     }
 
     button {
@@ -90,7 +88,7 @@
       border: none;
       border-radius: var(--border-radius);
       font-size: 1rem;
-      font-weight: 500; /* Más delgado */
+      font-weight: 600;
       cursor: pointer;
       transition: var(--transition);
     }
@@ -98,14 +96,67 @@
     button:hover {
       background-color: var(--primary-dark);
       transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Sombra al hover */
     }
 
-    /* Resto del CSS se mantiene igual... */
+    .required:after {
+      content: " *";
+      color: #e74c3c;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .logo img {
+      max-width: 120px;
+      height: auto;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Media Queries para Responsive */
+    @media (max-width: 768px) {
+      .login-container {
+        padding: 25px;
+      }
+      
+      h2 {
+        font-size: 1.5rem;
+      }
+      
+      input, button {
+        padding: 12px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 15px;
+      }
+      
+      .login-container {
+        padding: 20px;
+      }
+      
+      h2 {
+        font-size: 1.3rem;
+        margin-bottom: 20px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      input, button {
+        padding: 10px;
+        font-size: 0.9rem;
+      }
+    }
   </style>
 </head>
 <body>
-  <!-- El resto del HTML y JavaScript se mantiene igual -->
   <div class="login-container">
     <div class="logo">
       <!-- Puedes agregar tu logo aquí -->
