@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Consultas y Reportes</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1abc9c, #16a085);
+      padding: 30px;
+      color: #fff;
+    }
+    .form-container {
+      background: white;
+      color: #333;
+      max-width: 700px;
+      margin: auto;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      animation: fadeIn 0.7s ease-in;
+    }
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 25px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
+    }
+    select, input[type="date"], button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      background-color: #1abc9c;
+      color: white;
+      margin-top: 20px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #16a085;
+    }
+    table {
+      width: 100%;
+      margin-top: 25px;
+      border-collapse: collapse;
+      background: #f9f9f9;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+    th {
+      background-color: #eee;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Consultas y Reportes</h2>
+    <form id="form-consulta">
+      <label for="fecha">Fecha:</label>
+      <input type="date" id="fecha">
+
+      <label for="area">Área:</label>
+      <select id="area">
+        <option value="">Todas</option>
+      </select>
+
+      <label for="colaborador">Colaborador:</label>
+      <select id="colaborador">
+        <option value="">Todos</option>
+      </select>
+
+      <label for="supervisor">Supervisor:</label>
+      <select id="supervisor">
+        <option value="">Todos</option>
+      </select>
+
+      <button type="submit">Consultar</button>
+    </form>
+
+    <table id="resultados" style="display:none">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Área</th>
+          <th>Colaborador</th>
+          <th>Supervisor</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    const supabaseClient = supabase.createClient(
+      'https://jvcuujwkniicekolwljs.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2Y3V1andrbmlpY2Vrb2x3bGpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyMzE5MzgsImV4cCI6MjA2ODgwNzkzOH0.OFjrtoY0c9SLoDyNYuANxhCSA22cmTyAYfI8ceTICZ8'
+    );
+
+    async function cargarFiltros() {
+      const [areas, colaboradores, supervisores] = await Promise.all([
+        supabaseClient.from('area').select('id, area'),
+        supabaseClient.from('colaboradores').select('cedula, nombre_colaborador'),
+        supabaseClient.from('supervisores').select('cedula, nombre_supervisor'),
+      ]);
+
+      llenarSelect('area', areas.data, 'id', 'area');
+      llenarSelect('colaborador', colaboradores.data, 'cedula', 'nombre_colaborador');
+      llenarSelect('supervisor', supervisores.data, 'cedula', 'nombre_supervisor');
+    }
+
+    function llenarSelect(id, data, valueKey, labelKey) {
+      const select = document.getElementById(id);
+      data.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item[valueKey];
+        opt.textContent = item[labelKey];
+        select.appendChild(opt);
+      });
+    }
+
+    document.getElementById('form-consulta').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const fecha = document.getElementById('fecha').value;
+      const area = document.getElementById('area').value;
+      const colaborador = document.getElementById('colaborador').value;
+      const supervisor = document.getElementById('supervisor').value;
+
+      let query = supabaseClient.from('entregas').select(`
+        fecha,
+        area(id, area),
+        nombre_colaborador,
+        supervisor(cedula, nombre_supervisor)
+      `);
+
+      if (fecha) query = query.eq('fecha', fecha);
+      if (area) query = query.eq('area', parseInt(area));
+      if (colaborador) query = query.eq('cedula_colaborador', colaborador);
+      if (supervisor) query = query.eq('supervisor', supervisor);
+
+      const { data, error } = await query;
+
+      if (error) {
+        alert("Error al consultar");
+        console.error(error);
+        return;
+      }
+
+      const tbody = document.querySelector('#resultados tbody');
+      tbody.innerHTML = '';
+
+      data.forEach(entrega => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${entrega.fecha}</td>
+          <td>${entrega.area.area}</td>
+          <td>${entrega.nombre_colaborador}</td>
+          <td>${entrega.supervisor.nombre_supervisor}</td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      document.getElementById('resultados').style.display = 'table';
+    });
+
+    document.addEventListener('DOMContentLoaded', cargarFiltros);
+  </script>
+</body>
+</html>
