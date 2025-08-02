@@ -2,12 +2,13 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Agregar Supervisor</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #1abc9c, #16a085);
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
       padding: 30px;
       color: #fff;
     }
@@ -30,17 +31,26 @@
       font-size: 16px;
     }
     button {
-      background-color: #1abc9c;
+      background-color: #2ecc71;
       color: white;
       border: none;
       font-weight: bold;
     }
     button:hover {
-      background-color: #16a085;
+      background-color: #27ae60;
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-10px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 15px;
+      }
+      .form-container {
+        max-width: 100%;
+        padding: 20px;
+      }
     }
   </style>
 </head>
@@ -50,30 +60,31 @@
     <form id="form-supervisor">
       <label for="cedula">Cédula:</label>
       <input type="text" id="cedula" required>
-      <label for="nombre_supervisor">Nombre del Supervisor:</label>
-      <input type="text" id="nombre_supervisor" required>
+      
+      <label for="nombre">Nombre:</label>
+      <input type="text" id="nombre" required>
+      
       <button type="submit">Guardar</button>
     </form>
   </div>
 
   <script>
-
-     const supabaseClient = supabase.createClient(
-  	'https://jvcuujwkniicekolwljs.supabase.co',
-  	'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2Y3V1andrbmlpY2Vrb2x3bGpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyMzE5MzgsImV4cCI6MjA2ODgwNzkzOH0.OFjrtoY0c9SLoDyNYuANxhCSA22cmTyAYfI8ceTICZ8'
-     );
+    const supabaseClient = supabase.createClient(
+      'https://jvcuujwkniicekolwljs.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2Y3V1andrbmlpY2Vrb2x3bGpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyMzE5MzgsImV4cCI6MjA2ODgwNzkzOH0.OFjrtoY0c9SLoDyNYuANxhCSA22cmTyAYfI8ceTICZ8'
+    );
 
     document.getElementById('form-supervisor').addEventListener('submit', async (e) => {
       e.preventDefault();
       const cedula = document.getElementById('cedula').value.trim();
-      const nombre_supervisor = document.getElementById('nombre_supervisor').value.trim();
+      const nombre_supervisor = document.getElementById('nombre').value.trim();
 
-      const { error } = await supabaseClient.from('supervisores').insert([
-        { cedula, nombre_supervisor }
-      ]);
+      const { error } = await supabaseClient
+        .from('supervisores')
+        .insert([{ cedula, nombre_supervisor }]);
 
       if (error) {
-        alert("❌ Error al guardar");
+        alert("❌ Error al guardar supervisor");
         console.error(error);
       } else {
         alert("✅ Supervisor registrado");
@@ -83,3 +94,5 @@
   </script>
 </body>
 </html>
+
+
