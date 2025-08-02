@@ -2,19 +2,26 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Agregar EPP</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #1abc9c, #16a085);
       padding: 30px;
+      margin: 0;
       color: #fff;
+      overflow-x: hidden;
     }
     .form-container {
       background: white;
       color: #333;
-      max-width: 400px;
+      max-width: 100%;
+      width: 400px;
       margin: auto;
       padding: 30px;
       border-radius: 15px;
@@ -57,11 +64,10 @@
   </div>
 
   <script>
-
-     const supabaseClient = supabase.createClient(
-  	'https://jvcuujwkniicekolwljs.supabase.co',
-  	'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2Y3V1andrbmlpY2Vrb2x3bGpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyMzE5MzgsImV4cCI6MjA2ODgwNzkzOH0.OFjrtoY0c9SLoDyNYuANxhCSA22cmTyAYfI8ceTICZ8'
-     );
+    const supabaseClient = supabase.createClient(
+      'https://jvcuujwkniicekolwljs.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2Y3V1andrbmlpY2Vrb2x3bGpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyMzE5MzgsImV4cCI6MjA2ODgwNzkzOH0.OFjrtoY0c9SLoDyNYuANxhCSA22cmTyAYfI8ceTICZ8'
+    );
 
     document.getElementById('form-epp').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -83,3 +89,5 @@
   </script>
 </body>
 </html>
+
+
