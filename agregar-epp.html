@@ -2,26 +2,20 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Agregar EPP</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    * {
-      box-sizing: border-box;
-    }
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #1abc9c, #16a085);
+      background: linear-gradient(135deg, #e67e22, #f39c12);
       padding: 30px;
-      margin: 0;
       color: #fff;
-      overflow-x: hidden;
     }
     .form-container {
       background: white;
       color: #333;
-      max-width: 100%;
-      width: 400px;
+      max-width: 400px;
       margin: auto;
       padding: 30px;
       border-radius: 15px;
@@ -37,17 +31,26 @@
       font-size: 16px;
     }
     button {
-      background-color: #1abc9c;
+      background-color: #e67e22;
       color: white;
       border: none;
       font-weight: bold;
     }
     button:hover {
-      background-color: #16a085;
+      background-color: #d35400;
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-10px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 15px;
+      }
+      .form-container {
+        max-width: 100%;
+        padding: 20px;
+      }
     }
   </style>
 </head>
@@ -57,8 +60,10 @@
     <form id="form-epp">
       <label for="codigo">Código:</label>
       <input type="text" id="codigo" required>
+      
       <label for="descripcion">Descripción:</label>
       <input type="text" id="descripcion" required>
+      
       <button type="submit">Guardar</button>
     </form>
   </div>
@@ -74,12 +79,12 @@
       const codigo = document.getElementById('codigo').value.trim();
       const descripcion = document.getElementById('descripcion').value.trim();
 
-      const { error } = await supabaseClient.from('epp').insert([
-        { codigo, descripcion }
-      ]);
+      const { error } = await supabaseClient
+        .from('epp')
+        .insert([{ codigo, descripcion }]);
 
       if (error) {
-        alert("❌ Error al guardar");
+        alert("❌ Error al guardar EPP");
         console.error(error);
       } else {
         alert("✅ EPP registrado");
@@ -89,5 +94,7 @@
   </script>
 </body>
 </html>
+
+
 
 
