@@ -2,104 +2,140 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Consultas y Reportes</title>
+  <title>Reporte de Entregas de EPP</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #1abc9c, #16a085);
-      padding: 30px;
-      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f8f9fa;
+      padding: 20px;
+      color: #333;
     }
     .form-container {
       background: white;
-      color: #333;
-      max-width: 700px;
-      margin: auto;
+      max-width: 1200px;
+      margin: 0 auto;
       padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-      animation: fadeIn 0.7s ease-in;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
     h2 {
       text-align: center;
       color: #2c3e50;
       margin-bottom: 25px;
     }
-    label {
-      font-weight: bold;
-      display: block;
-      margin-top: 15px;
+    .filters-grid {
+      display: grid;
+      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     }
-    select, input[type="date"], button {
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #495057;
+    }
+    select, input[type="date"], input[type="month"] {
       width: 100%;
-      padding: 12px;
-      margin-top: 8px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 16px;
+      padding: 10px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      font-size: 14px;
     }
     button {
-      background-color: #1abc9c;
+      background-color: #3498db;
       color: white;
+      border: none;
+      padding: 12px 20px;
       margin-top: 20px;
-      font-weight: bold;
+      border-radius: 4px;
       cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+      transition: background 0.3s;
     }
     button:hover {
-      background-color: #16a085;
+      background-color: #2980b9;
     }
     table {
       width: 100%;
-      margin-top: 25px;
       border-collapse: collapse;
-      background: #f9f9f9;
+      margin-top: 25px;
+      font-size: 14px;
     }
     th, td {
-      padding: 10px;
-      border: 1px solid #ccc;
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
     }
     th {
-      background-color: #eee;
+      background-color: #3498db;
+      color: white;
+      font-weight: 600;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
+    tr:hover {
+      background-color: #f5f5f5;
+    }
+    .no-results {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8d7da;
+      color: #721c24;
+      border-radius: 4px;
+      text-align: center;
+      display: none;
+    }
+    .results-summary {
+      margin-top: 15px;
+      padding: 10px;
+      background: #e2f3f8;
+      border-radius: 4px;
+      display: none;
     }
   </style>
 </head>
 <body>
   <div class="form-container">
-    <h2>Consultas y Reportes</h2>
+    <h2>Reporte de Entregas de EPP</h2>
     <form id="form-consulta">
-      <label for="fecha">Fecha:</label>
-      <input type="date" id="fecha">
-
-      <label for="area">Área:</label>
-      <select id="area">
-        <option value="">Todas</option>
-      </select>
-
-      <label for="colaborador">Colaborador:</label>
-      <select id="colaborador">
-        <option value="">Todos</option>
-      </select>
-
-      <label for="supervisor">Supervisor:</label>
-      <select id="supervisor">
-        <option value="">Todos</option>
-      </select>
-
-      <button type="submit">Consultar</button>
+      <div class="filters-grid">
+        <div>
+          <label for="fecha">Fecha específica:</label>
+          <input type="date" id="fecha">
+        </div>
+        <div>
+          <label for="mes">Mes:</label>
+          <input type="month" id="mes">
+        </div>
+        <div>
+          <label for="area">Área:</label>
+          <select id="area"><option value="">Todas</option></select>
+        </div>
+        <div>
+          <label for="colaborador">Colaborador:</label>
+          <select id="colaborador"><option value="">Todos</option></select>
+        </div>
+        <div>
+          <label for="supervisor">Supervisor:</label>
+          <select id="supervisor"><option value="">Todos</option></select>
+        </div>
+      </div>
+      <button type="submit">Generar Reporte</button>
     </form>
+
+    <div id="mensaje" class="no-results"></div>
+    <div id="resumen" class="results-summary"></div>
 
     <table id="resultados" style="display:none">
       <thead>
         <tr>
           <th>Fecha</th>
-          <th>Área</th>
-          <th>Colaborador</th>
           <th>Supervisor</th>
+          <th>Área</th>
+          <th>Cédula Colaborador</th>
+          <th>Nombre Colaborador</th>
+          <th>Descripción EPP</th>
+          <th>Código</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -112,74 +148,146 @@
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2Y3V1andrbmlpY2Vrb2x3bGpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyMzE5MzgsImV4cCI6MjA2ODgwNzkzOH0.OFjrtoY0c9SLoDyNYuANxhCSA22cmTyAYfI8ceTICZ8'
     );
 
-    async function cargarFiltros() {
-      const [areas, colaboradores, supervisores] = await Promise.all([
-        supabaseClient.from('area').select('id, area'),
-        supabaseClient.from('colaboradores').select('cedula, nombre_colaborador'),
-        supabaseClient.from('supervisores').select('cedula, nombre_supervisor'),
-      ]);
-
-      llenarSelect('area', areas.data, 'id', 'area');
-      llenarSelect('colaborador', colaboradores.data, 'cedula', 'nombre_colaborador');
-      llenarSelect('supervisor', supervisores.data, 'cedula', 'nombre_supervisor');
-    }
-
-    function llenarSelect(id, data, valueKey, labelKey) {
-      const select = document.getElementById(id);
-      data.forEach(item => {
-        const opt = document.createElement('option');
-        opt.value = item[valueKey];
-        opt.textContent = item[labelKey];
-        select.appendChild(opt);
-      });
-    }
-
     document.getElementById('form-consulta').addEventListener('submit', async (e) => {
       e.preventDefault();
-
+      
+      // Limpiar resultados anteriores
+      document.getElementById('mensaje').style.display = 'none';
+      document.getElementById('resultados').style.display = 'none';
+      document.getElementById('resumen').style.display = 'none';
+      
+      // Obtener valores del formulario
       const fecha = document.getElementById('fecha').value;
+      const mes = document.getElementById('mes').value;
       const area = document.getElementById('area').value;
       const colaborador = document.getElementById('colaborador').value;
       const supervisor = document.getElementById('supervisor').value;
 
-      let query = supabaseClient.from('entregas').select(`
-        fecha,
-        area(id, area),
-        nombre_colaborador,
-        supervisor(cedula, nombre_supervisor)
-      `);
-
-      if (fecha) query = query.eq('fecha', fecha);
-      if (area) query = query.eq('area', parseInt(area));
-      if (colaborador) query = query.eq('cedula_colaborador', colaborador);
-      if (supervisor) query = query.eq('supervisor', supervisor);
-
-      const { data, error } = await query;
-
-      if (error) {
-        alert("Error al consultar");
-        console.error(error);
+      // Validación básica
+      if (!fecha && !mes) {
+        mostrarMensaje('Por favor seleccione una fecha o un mes para consultar.');
         return;
       }
 
-      const tbody = document.querySelector('#resultados tbody');
-      tbody.innerHTML = '';
+      try {
+        // CONSULTA PRINCIPAL OPTIMIZADA
+        let query = supabaseClient
+          .from('entregas')
+          .select(`
+            id, 
+            fecha, 
+            supervisor:supervisores(nombre_supervisor), 
+            area:area(area), 
+            cedula_colaborador, 
+            nombre_colaborador,
+            detalles:detalle_entregas(
+              codigo,
+              descripcion_epp,
+              epp: epp(descripcion)
+            )
+          `);
 
-      data.forEach(entrega => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${entrega.fecha}</td>
-          <td>${entrega.area.area}</td>
-          <td>${entrega.nombre_colaborador}</td>
-          <td>${entrega.supervisor.nombre_supervisor}</td>
-        `;
-        tbody.appendChild(row);
-      });
+        // Aplicar filtros
+        if (fecha) query = query.eq('fecha', fecha);
+        if (mes) {
+          const [year, month] = mes.split('-');
+          const desde = `${year}-${month}-01`;
+          const hasta = new Date(year, month, 0).toISOString().split('T')[0];
+          query = query.gte('fecha', desde).lte('fecha', hasta);
+        }
+        if (area) query = query.eq('area', area);
+        if (colaborador) query = query.eq('cedula_colaborador', colaborador);
+        if (supervisor) query = query.eq('supervisor', supervisor);
 
-      document.getElementById('resultados').style.display = 'table';
+        // Ordenar por fecha descendente
+        query = query.order('fecha', { ascending: false });
+
+        const { data: entregas, error } = await query;
+
+        if (error) throw error;
+        if (!entregas || entregas.length === 0) {
+          mostrarMensaje('No se encontraron entregas con los filtros seleccionados.');
+          return;
+        }
+
+        // Procesar resultados
+        mostrarResultados(entregas, fecha || mes);
+
+      } catch (error) {
+        console.error('Error en la consulta:', error);
+        mostrarMensaje('Ocurrió un error al generar el reporte. Por favor intente nuevamente.');
+      }
     });
 
+    function mostrarResultados(entregas, periodo) {
+      const tbody = document.querySelector('#resultados tbody');
+      tbody.innerHTML = '';
+      let totalItems = 0;
+
+      entregas.forEach(entrega => {
+        const detalles = entrega.detalles || [];
+        
+        if (detalles.length === 0) {
+          // Mostrar entrega incluso sin detalles
+          agregarFila(
+            tbody,
+            entrega.fecha,
+            entrega.supervisor?.nombre_supervisor || 'N/A',
+            entrega.area?.area || 'N/A',
+            entrega.cedula_colaborador,
+            entrega.nombre_colaborador,
+            'N/A',
+            'N/A'
+          );
+        } else {
+          detalles.forEach(detalle => {
+            agregarFila(
+              tbody,
+              entrega.fecha,
+              entrega.supervisor?.nombre_supervisor || 'N/A',
+              entrega.area?.area || 'N/A',
+              entrega.cedula_colaborador,
+              entrega.nombre_colaborador,
+              detalle.descripcion_epp || detalle.epp?.descripcion || 'N/A',
+              detalle.codigo || 'N/A'
+            );
+            totalItems++;
+          });
+        }
+      });
+
+      // Mostrar resumen
+      document.getElementById('resumen').innerHTML = `
+        <strong>Resultados:</strong> ${entregas.length} entregas con ${totalItems} items de EPP
+        ${periodo ? `para ${periodo.includes('-') ? 'el mes' : 'la fecha'} ${periodo}` : ''}
+      `;
+      document.getElementById('resumen').style.display = 'block';
+      document.getElementById('resultados').style.display = 'table';
+    }
+
+    function agregarFila(tbody, fecha, supervisor, area, cedula, nombre, descripcion, codigo) {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${fecha}</td>
+        <td>${supervisor}</td>
+        <td>${area}</td>
+        <td>${cedula}</td>
+        <td>${nombre}</td>
+        <td>${descripcion}</td>
+        <td>${codigo}</td>
+      `;
+      tbody.appendChild(row);
+    }
+
+    function mostrarMensaje(texto) {
+      const mensaje = document.getElementById('mensaje');
+      mensaje.textContent = texto;
+      mensaje.style.display = 'block';
+    }
+
+    // Cargar filtros al iniciar (función anterior se mantiene igual)
     document.addEventListener('DOMContentLoaded', cargarFiltros);
   </script>
 </body>
 </html>
+
