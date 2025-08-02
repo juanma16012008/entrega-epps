@@ -8,7 +8,7 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #1abc9c, #16a085);
+      background: linear-gradient(135deg, #2980b9, #6dd5fa);
       padding: 30px;
       color: #fff;
     }
@@ -31,13 +31,13 @@
       font-size: 16px;
     }
     button {
-      background-color: #1abc9c;
+      background-color: #2980b9;
       color: white;
       border: none;
       font-weight: bold;
     }
     button:hover {
-      background-color: #16a085;
+      background-color: #2471a3;
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-10px); }
@@ -58,7 +58,7 @@
   <div class="form-container">
     <h2>Agregar Área</h2>
     <form id="form-area">
-      <label for="area">Nombre del área:</label>
+      <label for="area">Nombre del Área:</label>
       <input type="text" id="area" required>
       <button type="submit">Guardar</button>
     </form>
@@ -67,7 +67,7 @@
   <script>
     const supabaseClient = supabase.createClient(
       'https://jvcuujwkniicekolwljs.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2Y3V1andrbmlpY2Vrb2x3bGpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyMzE5MzgsImV4cCI6MjA2ODgwNzkzOH0.OFjrtoY0c9SLoDyNYuANxhCSA22cmTyAYfI8ceTICZ8'
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
     );
 
     document.getElementById('form-area').addEventListener('submit', async (e) => {
@@ -77,13 +77,15 @@
       const { error } = await supabaseClient.from('area').insert([{ area }]);
 
       if (error) {
-        alert("❌ Error al guardar el área");
+        alert("❌ Error al guardar área");
         console.error(error);
       } else {
-        alert("✅ Área registrada correctamente");
+        alert("✅ Área registrada");
         e.target.reset();
       }
     });
   </script>
 </body>
 </html>
+
+
