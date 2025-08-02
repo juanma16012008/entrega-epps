@@ -2,12 +2,13 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Agregar Colaborador</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #1abc9c, #16a085);
+      background: linear-gradient(135deg, #16a085, #1abc9c);
       padding: 30px;
       color: #fff;
     }
@@ -30,17 +31,26 @@
       font-size: 16px;
     }
     button {
-      background-color: #1abc9c;
+      background-color: #16a085;
       color: white;
       border: none;
       font-weight: bold;
     }
     button:hover {
-      background-color: #16a085;
+      background-color: #138d75;
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-10px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 15px;
+      }
+      .form-container {
+        max-width: 100%;
+        padding: 20px;
+      }
     }
   </style>
 </head>
@@ -50,30 +60,31 @@
     <form id="form-colaborador">
       <label for="cedula">Cédula:</label>
       <input type="text" id="cedula" required>
-      <label for="nombre_colaborador">Nombre del Colaborador:</label>
-      <input type="text" id="nombre_colaborador" required>
+      
+      <label for="nombre">Nombre del Colaborador:</label>
+      <input type="text" id="nombre" required>
+      
       <button type="submit">Guardar</button>
     </form>
   </div>
 
   <script>
-
-     const supabaseClient = supabase.createClient(
-  	'https://jvcuujwkniicekolwljs.supabase.co',
-  	'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2Y3V1andrbmlpY2Vrb2x3bGpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyMzE5MzgsImV4cCI6MjA2ODgwNzkzOH0.OFjrtoY0c9SLoDyNYuANxhCSA22cmTyAYfI8ceTICZ8'
-     );
+    const supabaseClient = supabase.createClient(
+      'https://jvcuujwkniicekolwljs.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2Y3V1andrbmlpY2Vrb2x3bGpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyMzE5MzgsImV4cCI6MjA2ODgwNzkzOH0.OFjrtoY0c9SLoDyNYuANxhCSA22cmTyAYfI8ceTICZ8'
+    );
 
     document.getElementById('form-colaborador').addEventListener('submit', async (e) => {
       e.preventDefault();
       const cedula = document.getElementById('cedula').value.trim();
-      const nombre_colaborador = document.getElementById('nombre_colaborador').value.trim();
+      const nombre_colaborador = document.getElementById('nombre').value.trim();
 
-      const { error } = await supabaseClient.from('colaboradores').insert([
-        { cedula, nombre_colaborador }
-      ]);
+      const { error } = await supabaseClient
+        .from('colaboradores')
+        .insert([{ cedula, nombre_colaborador }]);
 
       if (error) {
-        alert("❌ Error al guardar");
+        alert("❌ Error al guardar colaborador");
         console.error(error);
       } else {
         alert("✅ Colaborador registrado");
@@ -83,3 +94,4 @@
   </script>
 </body>
 </html>
+
