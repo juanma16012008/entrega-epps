@@ -182,12 +182,16 @@
         </div>
 
         <div class="full-width" id="epp-container">
-          <div class="epp-group">
-            <label class="required">EPP (Descripción):</label>
-            <select class="epp-select" required></select>
-            <input type="hidden" class="codigo">
-          </div>
-        </div>
+
+	<div class="epp-group">
+  	  <label class="required">EPP (Descripción):</label>
+  	  <select class="epp-select" required></select>
+  	  <input type="hidden" class="codigo">
+  	  <label class="required">Cantidad:</label>
+  	  <input type="number" class="cantidad" min="1" value="1" required>
+	</div>
+
+       </div>
       </div>
 
       <button type="button" onclick="agregarEPP()" class="secondary">➕ Agregar otro EPP</button>
@@ -320,12 +324,15 @@
       const entregaId = result.data[0].id;
       const detalles = [];
 
-      document.querySelectorAll('.epp-group').forEach(grupo => {
-  	const select = grupo.querySelector('.epp-select');
-  	const codigo = select.value;
-  	const descripcion = select.selectedOptions[0]?.textContent || '';
-  	if (codigo && descripcion) {
-    		detalles.push({ id_entrega: entregaId, codigo, descripcion_epp: descripcion});
+
+
+	document.querySelectorAll('.epp-group').forEach(grupo => {
+  	  const select = grupo.querySelector('.epp-select');
+  	  const codigo = select.value;
+  	  const descripcion = select.selectedOptions[0]?.textContent || '';
+  	  const cantidad = parseInt(grupo.querySelector('.cantidad').value) || 1;
+  	  if (codigo && descripcion) {
+    		detalles.push({id_entrega: entregaId, codigo, descripcion_epp: descripcion, cantidad});
 
         }
       });
@@ -360,4 +367,5 @@
   </script>
 </body>
 </html>
+
 
