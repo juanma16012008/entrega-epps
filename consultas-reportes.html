@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>Reporte de Entregas de EPP</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -51,11 +52,18 @@
       border-radius: 4px;
       cursor: pointer;
       font-size: 16px;
-      width: 100%;
       transition: background 0.3s;
     }
     button:hover {
       background-color: #2980b9;
+    }
+    .export-btn {
+      display: none;
+      margin-left: 10px;
+      background-color: #2ecc71;
+    }
+    .export-btn:hover {
+      background-color: #27ae60;
     }
     table {
       width: 100%;
@@ -92,6 +100,11 @@
       border-radius: 4px;
       display: none;
     }
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -120,7 +133,10 @@
           <select id="supervisor"><option value="">Todos</option></select>
         </div>
       </div>
-      <button type="submit">Generar Reporte</button>
+      <div class="actions">
+        <button type="submit">Generar Reporte</button>
+        <button type="button" class="export-btn" id="btnExportar">Exportar a Excel</button>
+      </div>
     </form>
 
     <div id="mensaje" class="no-results"></div>
@@ -155,6 +171,7 @@
       document.getElementById('mensaje').style.display = 'none';
       document.getElementById('resultados').style.display = 'none';
       document.getElementById('resumen').style.display = 'none';
+      document.getElementById('btnExportar').style.display = 'none';
 
       const fecha = document.getElementById('fecha').value;
       const mes = document.getElementById('mes').value;
@@ -223,30 +240,17 @@
         const detalles = entrega.detalles || [];
 
         if (detalles.length === 0) {
-          agregarFila(
-            tbody,
-            entrega.fecha,
-            entrega.supervisor?.nombre_supervisor || 'N/A',
-            entrega.area?.area || 'N/A',
-            entrega.cedula_colaborador,
-            entrega.nombre_colaborador,
-            'N/A',
-            'N/A',
-            'N/A'
-          );
+          agregarFila(tbody, entrega.fecha, entrega.supervisor?.nombre_supervisor || 'N/A',
+                      entrega.area?.area || 'N/A', entrega.cedula_colaborador,
+                      entrega.nombre_colaborador, 'N/A', 'N/A', 'N/A');
         } else {
           detalles.forEach(detalle => {
-            agregarFila(
-              tbody,
-              entrega.fecha,
-              entrega.supervisor?.nombre_supervisor || 'N/A',
-              entrega.area?.area || 'N/A',
-              entrega.cedula_colaborador,
-              entrega.nombre_colaborador,
-              detalle.descripcion_epp || detalle.epp?.descripcion || 'N/A',
-              detalle.codigo || 'N/A',
-              detalle.cantidad || 'N/A'
-            );
+            agregarFila(tbody, entrega.fecha, entrega.supervisor?.nombre_supervisor || 'N/A',
+                        entrega.area?.area || 'N/A', entrega.cedula_colaborador,
+                        entrega.nombre_colaborador,
+                        detalle.descripcion_epp || detalle.epp?.descripcion || 'N/A',
+                        detalle.codigo || 'N/A',
+                        detalle.cantidad || 'N/A');
             totalItems++;
           });
         }
@@ -258,6 +262,7 @@
       `;
       document.getElementById('resumen').style.display = 'block';
       document.getElementById('resultados').style.display = 'table';
+      document.getElementById('btnExportar').style.display = 'inline-block';
     }
 
     function agregarFila(tbody, fecha, supervisor, area, cedula, nombre, descripcion, codigo, cantidad) {
@@ -281,9 +286,13 @@
       mensaje.style.display = 'block';
     }
 
-    document.addEventListener('DOMContentLoaded', cargarFiltros);
+    document.getElementById('btnExportar').addEventListener('click', () => {
+      const table = document.getElementById('resultados');
+      const wb = XLSX.utils.table_to_book(table, { sheet: "Reporte EPP" });
+      XLSX.writeFile(wb, "reporte_entregas_epp.xlsx");
+    });
 
-    async function cargarFiltros() {
+    document.addEventListener('DOMContentLoaded', async () => {
       const [{ data: areas }, { data: colaboradores }, { data: supervisores }] = await Promise.all([
         supabaseClient.from('area').select(),
         supabaseClient.from('colaboradores').select(),
@@ -293,7 +302,7 @@
       cargarSelect('area', areas, 'id', 'area');
       cargarSelect('colaborador', colaboradores, 'cedula', 'nombre_colaborador');
       cargarSelect('supervisor', supervisores, 'cedula', 'nombre_supervisor');
-    }
+    });
 
     function cargarSelect(id, data, valueField, textField) {
       const select = document.getElementById(id);
@@ -307,6 +316,7 @@
   </script>
 </body>
 </html>
+
 
 
 
