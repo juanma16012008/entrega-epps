@@ -153,6 +153,7 @@
 </head>
 <body>
   <div class="form-container">
+
     <h1>Entrega de EPPs</h1>
     <form id="form-entrega">
       <div class="form-grid">
@@ -196,6 +197,13 @@
 
       <button type="button" onclick="agregarEPP()" class="secondary">➕ Agregar otro EPP</button>
       <button type="submit">Guardar entrega</button>
+
+      <div style="text-align: right; margin-bottom: 10px;">
+        <button onclick="cerrarSesion()" style="background-color: #e74c3c; color: white; padding: 10px 16px; border: none; border-radius: 5px; cursor: pointer;">
+        🔓 Cerrar sesión </button>
+      </div>
+
+
     </form>
   </div>
 
@@ -364,9 +372,18 @@
       container.appendChild(grupo);
       llenarSelectEPP(grupo.querySelector('.epp-select'), epps);
     });
+
+      function cerrarSesion() {
+        localStorage.removeItem('cedula'); // Borra la sesión
+        window.location.href = "index.html"; // Redirige al login
+     }
+
+
+
   </script>
 </body>
 </html>
+
 
 
 
