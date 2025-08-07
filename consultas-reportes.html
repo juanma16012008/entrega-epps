@@ -130,62 +130,6 @@
   }
 }
 
-
-@media (max-width: 767px) {
-  .form-container {
-    padding: 15px;
-    border-radius: 0;
-    box-shadow: none;
-  }
-
-  h2 {
-    font-size: 1.4rem;
-    margin-bottom: 20px;
-    text-align: center;
-  }
-
-  .filters-grid {
-    grid-template-columns: 1fr !important;
-    gap: 15px;
-  }
-
-  label {
-    font-size: 14px;
-  }
-
-  select, input[type="date"], input[type="month"] {
-    font-size: 14px;
-    padding: 10px;
-  }
-
-  .actions {
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 20px;
-  }
-
-  button {
-    width: 100%;
-    font-size: 15px;
-    padding: 10px;
-  }
-
-  .results-summary,
-  .no-results {
-    font-size: 14px;
-  }
-
-  table {
-    font-size: 12px;
-    display: block;
-    overflow-x: auto;
-  }
-
-  th, td {
-    white-space: nowrap;
-  }
-}
-
 </style>
 </head>
 <body>
@@ -280,69 +224,71 @@
     await consultarEntregas(); // Carga inicial sin filtros
   });
 
-  async function consultarEntregas() {
-    limpiarResultados();
+    async function consultarEntregas() {
+      limpiarResultados();
 
-    const fecha = document.getElementById('fecha').value;
-    const mes = document.getElementById('mes').value;
-    const area = document.getElementById('area').value;
-    const colaborador = document.getElementById('colaborador').value;
-    const supervisor = document.getElementById('supervisor').value;
+      const fecha = document.getElementById('fecha').value;
+      const mes = document.getElementById('mes').value;
+      const area = document.getElementById('area').value;
+      const colaborador = document.getElementById('colaborador').value;
+      const supervisor = document.getElementById('supervisor').value;
 
-    if (!fecha && !mes && !area && !colaborador && !supervisor) {
-      // No se aplica ningún filtro
-    } else if (!fecha && !mes) {
-      mostrarMensaje('Por favor seleccione una fecha o un mes para consultar.');
-      return;
-    }
+      try {
+        let query = supabaseClient
+          .from('entregas')
+          .select(`
+            id, 
+            fecha, 
+            supervisor:supervisores(nombre_supervisor), 
+            area:area(area), 
+            cedula_colaborador, 
+            nombre_colaborador,
+            detalles:detalle_entregas(
+              codigo,
+              descripcion_epp,
+              cantidad,
+              epp:epp(descripcion)
+            )
+          `);
 
-    try {
-      let query = supabaseClient
-        .from('entregas')
-        .select(`
-          id, 
-          fecha, 
-          supervisor:supervisores(nombre_supervisor), 
-          area:area(area), 
-          cedula_colaborador, 
-          nombre_colaborador,
-          detalles:detalle_entregas(
-            codigo,
-            descripcion_epp,
-            cantidad,
-            epp:epp(descripcion)
-          )
-        `);
+       // Aplicar filtros solo si hay valor
+       if (fecha) query = query.eq('fecha', fecha);
+       if (mes) {
+         const [year, month] = mes.split('-');
+         const desde = `${year}-${month}-01`;
+         const hasta = new Date(year, month, 0).toISOString().split('T')[0];
+         query = query.gte('fecha', desde).lte('fecha', hasta);
+       }
+       if (area) query = query.eq('area', area);
+       if (colaborador) query = query.eq('cedula_colaborador', colaborador);
+       if (supervisor) query = query.eq('supervisor', supervisor);
 
-      if (fecha) query = query.eq('fecha', fecha);
-      if (mes) {
-        const [year, month] = mes.split('-');
-        const desde = `${year}-${month}-01`;
-        const hasta = new Date(year, month, 0).toISOString().split('T')[0];
-        query = query.gte('fecha', desde).lte('fecha', hasta);
-      }
-      if (area) query = query.eq('area', area);
-      if (colaborador) query = query.eq('cedula_colaborador', colaborador);
-      if (supervisor) query = query.eq('supervisor', supervisor);
+       query = query.order('fecha', { ascending: false });
 
-      query = query.order('fecha', { ascending: false });
+       const { data: entregas, error } = await query;
 
-      const { data: entregas, error } = await query;
+       if (error) throw error;
+       if (!entregas || entregas.length === 0) {
+         mostrarMensaje('No se encontraron entregas con los filtros seleccionados.');
+         return;
+       }
 
-      if (error) throw error;
-      if (!entregas || entregas.length === 0) {
-        mostrarMensaje('No se encontraron entregas con los filtros seleccionados.');
-        return;
-      }
+       let periodo = '';
+       if (fecha) {
+         periodo = `para la fecha ${fecha}`;
+       } else if (mes) {
+         periodo = `para el mes ${mes}`;
+       } else if (!fecha && !mes && !area && !colaborador && !supervisor) {
+         periodo = 'mostrando todas las entregas';
+       }
+   
+       mostrarResultados(entregas, periodo);
 
-      const periodo = fecha || mes || null;
-      mostrarResultados(entregas, periodo);
-
-    } catch (error) {
-      console.error('Error en la consulta:', error);
-      mostrarMensaje('Ocurrió un error al generar el reporte.');
-    }
-  }
+     } catch (error) {
+       console.error('Error en la consulta:', error);
+       mostrarMensaje('Ocurrió un error al generar el reporte.');
+     }
+   }
 
   function mostrarResultados(entregas, periodo) {
     const tbody = document.querySelector('#resultados tbody');
@@ -371,8 +317,9 @@
 
     document.getElementById('resumen').innerHTML = `
       <strong>Resultados:</strong> ${entregas.length} entregas con ${totalItems} items de EPP
-      ${periodo ? `para ${periodo.includes('-') ? 'el mes' : 'la fecha'} ${periodo}` : ''}
+      ${periodo ? `(${periodo})` : ''}
     `;
+
     document.getElementById('resumen').style.display = 'block';
     document.getElementById('resultados').style.display = 'table';
     document.getElementById('btnExportar').style.display = 'inline-block';
@@ -430,16 +377,3 @@
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
