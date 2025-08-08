@@ -365,9 +365,11 @@
       const grupo = document.createElement('div');
       grupo.className = 'epp-group';
       grupo.innerHTML = `
-        <label>EPP (Descripción):</label>
-        <select class="epp-select" required></select>
-        <input type="hidden" class="codigo">
+	<label class="required">EPP (Descripción):</label>
+  	<select class="epp-select" required></select>
+  	<input type="hidden" class="codigo">
+  	<label class="required">Cantidad:</label>
+  	<input type="number" class="cantidad" min="1" value="1" required>
       `;
       container.appendChild(grupo);
       llenarSelectEPP(grupo.querySelector('.epp-select'), epps);
@@ -383,8 +385,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
