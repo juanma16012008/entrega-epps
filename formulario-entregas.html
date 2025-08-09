@@ -185,13 +185,13 @@
 
         <div class="full-width" id="epp-container">
 
-	<div class="epp-group">
-  	  <label class="required">EPP (Descripción):</label>
-  	  <select class="epp-select" required></select>
-  	  <input type="hidden" class="codigo">
-  	  <label class="required">Cantidad:</label>
-  	  <input type="number" class="cantidad" min="1" value="1" required>
-	</div>
+  <div class="epp-group">
+      <label class="required">EPP (Descripción):</label>
+      <select class="epp-select" required></select>
+      <input type="hidden" class="codigo">
+      <label class="required">Cantidad:</label>
+      <input type="number" class="cantidad" min="1" value="1" required>
+  </div>
 
        </div>
       </div>
@@ -215,19 +215,28 @@
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2Y3V1andrbmlpY2Vrb2x3bGpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyMzE5MzgsImV4cCI6MjA2ODgwNzkzOH0.OFjrtoY0c9SLoDyNYuANxhCSA22cmTyAYfI8ceTICZ8'
     );
 
+    // --- Utilidad para asignar fecha local en formato YYYY-MM-DD ---
+    function setFechaHoyLocal() {
+      const hoy = new Date();
+      const anio = hoy.getFullYear();
+      const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+      const dia = String(hoy.getDate()).padStart(2, '0');
+      document.getElementById('fecha').value = `${anio}-${mes}-${dia}`;
+    }
+    // -----------------------------------------------------------
+
+    // Filtrado en vivo del select de colaboradores (input de búsqueda)
     document.getElementById('buscar_colaborador').addEventListener('input', function() {
       const filtro = this.value.toLowerCase();
       const opciones = document.getElementById('nombre_colaborador').options;
       for (let i = 0; i < opciones.length; i++) {
         const texto = opciones[i].textContent.toLowerCase();
         opciones[i].style.display = texto.includes(filtro) ? '' : 'none';
-        }
-  });
-
+      }
+    });
 
     document.addEventListener("DOMContentLoaded", async () => {
-      const today = new Date();
-      document.getElementById('fecha').value = today.toISOString().split("T")[0];
+      setFechaHoyLocal(); // ← asigna fecha local correctamente
 
       await llenarSupervisorDesdeSesion();
       cargarDatos();
@@ -343,16 +352,13 @@
       const entregaId = result.data[0].id;
       const detalles = [];
 
-
-
-	document.querySelectorAll('.epp-group').forEach(grupo => {
-  	  const select = grupo.querySelector('.epp-select');
-  	  const codigo = select.value;
-  	  const descripcion = select.selectedOptions[0]?.textContent || '';
-  	  const cantidad = parseInt(grupo.querySelector('.cantidad').value) || 1;
-  	  if (codigo && descripcion) {
-    		detalles.push({id_entrega: entregaId, codigo, descripcion_epp: descripcion, cantidad});
-
+      document.querySelectorAll('.epp-group').forEach(grupo => {
+        const select = grupo.querySelector('.epp-select');
+        const codigo = select.value;
+        const descripcion = select.selectedOptions[0]?.textContent || '';
+        const cantidad = parseInt(grupo.querySelector('.cantidad').value) || 1;
+        if (codigo && descripcion) {
+          detalles.push({id_entrega: entregaId, codigo, descripcion_epp: descripcion, cantidad});
         }
       });
 
@@ -367,7 +373,9 @@
 
       alert("✅ Entrega registrada con éxito");
       e.target.reset();
-      document.getElementById('fecha').value = new Date().toISOString().split("T")[0];
+
+      // → usar la misma función que asigna fecha local (no toISOString)
+      setFechaHoyLocal();
       document.getElementById('cedula_colaborador').value = '';
       document.getElementById('epp-container').innerHTML = '';
 
@@ -376,22 +384,20 @@
       const grupo = document.createElement('div');
       grupo.className = 'epp-group';
       grupo.innerHTML = `
-	<label class="required">EPP (Descripción):</label>
-  	<select class="epp-select" required></select>
-  	<input type="hidden" class="codigo">
-  	<label class="required">Cantidad:</label>
-  	<input type="number" class="cantidad" min="1" value="1" required>
+        <label class="required">EPP (Descripción):</label>
+        <select class="epp-select" required></select>
+        <input type="hidden" class="codigo">
+        <label class="required">Cantidad:</label>
+        <input type="number" class="cantidad" min="1" value="1" required>
       `;
       container.appendChild(grupo);
       llenarSelectEPP(grupo.querySelector('.epp-select'), epps);
     });
 
-      function cerrarSesion() {
-        localStorage.removeItem('cedula'); // Borra la sesión
-        window.location.href = "index.html"; // Redirige al login
-     }
-
-
+    function cerrarSesion() {
+      localStorage.removeItem('cedula'); // Borra la sesión
+      window.location.href = "index.html"; // Redirige al login
+    }
 
   </script>
 </body>
